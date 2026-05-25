@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shambhavi Garg</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --ink: #1A1612;
+    --muted: #6B6560;
+    --gold: #B8860B;
+    --gold-light: #F5EDD0;
+    --rust: #8B3A2A;
+    --border: rgba(26,22,18,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 4rem;
+    background: rgba(250,247,242,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700;
+    text-decoration: none; color: var(--ink);
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 5rem 3rem 5rem 4rem;
+    border-right: 1px solid var(--border);
+  }
+  .hero-tag {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); font-weight: 500; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .hero-tag::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--gold); }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    line-height: 1.08; font-weight: 700;
+    letter-spacing: -0.01em; margin-bottom: 1.5rem;
+  }
+  h1 em { font-style: italic; color: var(--rust); }
+  .hero-desc { font-size: 1.05rem; color: var(--muted); max-width: 38ch; line-height: 1.8; margin-bottom: 2.5rem; }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 0.8rem;
+    background: var(--ink); color: var(--cream);
+    padding: 0.85rem 2rem; font-size: 0.85rem;
+    letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
+    text-decoration: none; transition: background 0.2s; width: fit-content;
+  }
+  .hero-cta:hover { background: var(--rust); }
+  .hero-right {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 5rem 4rem 5rem 3rem;
+  }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 3rem; }
+  .stat-box { background: white; border: 1px solid var(--border); padding: 1.5rem; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.4rem; }
+  .hero-quote {
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem;
+    color: var(--muted); border-left: 2px solid var(--gold); padding-left: 1.2rem; line-height: 1.6;
+  }
+
+  /* SECTIONS */
+  section { padding: 6rem 4rem; }
+  .section-label {
+    font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold);
+    text-transform: uppercase; font-weight: 500; margin-bottom: 0.8rem;
+  }
+  h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 700; line-height: 1.1; }
+  h2 em { font-style: italic; color: var(--rust); }
+
+  /* ABOUT */
+  #about {
+    background: white;
+    display: grid; grid-template-columns: 1fr 1.4fr;
+    gap: 5rem; padding: 6rem 4rem;
+    border-top: 1px solid var(--border);
+    align-items: start;
+  }
+  .about-left { position: sticky; top: 100px; }
+  .academics-list { margin-top: 2rem; }
+  .acad-item { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .acad-item:first-child { border-top: 1px solid var(--border); }
+  .acad-grade { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
+  .acad-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
+  .about-right p { color: var(--muted); margin-bottom: 1.5rem; font-size: 1.05rem; }
+  .highlight-tag {
+    display: inline-block; background: var(--gold-light); color: var(--gold);
+    font-size: 0.75rem; padding: 0.25rem 0.7rem;
+    letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; margin: 0.25rem 0.2rem;
+  }
+  .tags-row { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+  /* EXPERIENCE */
+  #experience { background: var(--cream); border-top: 1px solid var(--border); }
+  .exp-grid { display: flex; flex-direction: column; }
+  .exp-item {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 3rem; padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .exp-item:first-child { border-top: 1px solid var(--border); }
+  .exp-org { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .exp-year { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gold); margin-top: 0.3rem; }
+  .exp-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 0.7rem; }
+  .exp-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.75; }
+
+  /* AWARDS */
+  #awards { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.08); }
+  #awards .section-label { color: var(--gold); }
+  #awards h2 { color: var(--cream); }
+  #awards h2 em { color: #D4956A; }
+  .awards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.1); margin-top: 3.5rem; }
+  .award-card { background: var(--ink); padding: 2rem 1.8rem; border: 1px solid rgba(255,255,255,0.07); transition: background 0.2s; }
+  .award-card:hover { background: #26201A; }
+  .award-icon { font-size: 1.4rem; margin-bottom: 1rem; }
+  .award-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--cream); line-height: 1.3; margin-bottom: 0.5rem; }
+  .award-sub { font-size: 0.78rem; color: rgba(250,247,242,0.45); }
+
+  /* LEADERSHIP */
+  #leadership { background: white; border-top: 1px solid var(--border); }
+  .lead-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 3.5rem; }
+  .lead-card { border: 1px solid var(--border); padding: 1.8rem; position: relative; overflow: hidden; transition: border-color 0.2s; }
+  .lead-card:hover { border-color: var(--gold); }
+  .lead-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.3s; transform-origin: left; }
+  .lead-card:hover::before { transform: scaleX(1); }
+  .lead-role { font-size: 0.7rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin-bottom: 0.5rem; }
+  .lead-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .lead-desc { font-size: 0.88rem; color: var(--muted); }
+
+  /* CONTACT */
+  #contact { background: var(--cream); border-top: 1px solid var(--border); }
+  .contact-inner { display: grid; grid-template-columns: 1fr 1.4fr; gap: 5rem; align-items: start; }
+  .contact-left h2 { margin-bottom: 1rem; }
+  .contact-left p { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-bottom: 1.5rem; }
+  .contact-direct a { display: block; color: var(--muted); font-size: 0.9rem; text-decoration: none; margin-bottom: 0.4rem; transition: color 0.2s; }
+  .contact-direct a:hover { color: var(--ink); }
+
+  /* FORM */
+  .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: white; border: 1px solid var(--border);
+    padding: 0.8rem 1rem; font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; color: var(--ink); outline: none;
+    transition: border-color 0.2s; resize: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--gold); }
+  .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+  .submit-btn {
+    background: var(--ink); color: var(--cream);
+    border: none; padding: 0.9rem 2rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
+    cursor: pointer; transition: background 0.2s; align-self: flex-start;
+  }
+  .submit-btn:hover { background: var(--rust); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .form-status { font-size: 0.88rem; padding: 0.8rem 1rem; display: none; }
+  .form-status.success { background: #EAF5EA; color: #2D6A2D; display: block; }
+  .form-status.error { background: #FAEAEA; color: #8B2020; display: block; }
+
+  footer { padding: 2rem 4rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-text { font-size: 0.8rem; color: var(--muted); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-tag { animation: fadeUp 0.7s ease 0.1s both; }
+  h1 { animation: fadeUp 0.7s ease 0.2s both; }
+  .hero-desc { animation: fadeUp 0.7s ease 0.35s both; }
+  .hero-cta { animation: fadeUp 0.7s ease 0.5s both; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.2rem; }
+    .nav-links a { font-size: 0.75rem; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 3rem 1.5rem 2rem; border-right: none; border-bottom: 1px solid var(--border); }
+    .hero-right { padding: 2rem 1.5rem 3rem; }
+    #about { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 1.5rem; }
+    .about-left { position: static; }
+    section { padding: 4rem 1.5rem; }
+    .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+    .awards-grid { grid-template-columns: 1fr 1fr; }
+    .lead-grid { grid-template-columns: 1fr; }
+    .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Shambhavi Garg</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Work</a></li>
+    <li><a href="#awards">Awards</a></li>
+    <li><a href="#leadership">Leadership</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Delhi, India · Class of 2026</div>
+    <h1>Policy.<br><em>Research.</em><br>Impact.</h1>
+    <p class="hero-desc">First Indian shortlisted for the MEXT Japanese Government Scholarship. Policy researcher, filmmaker, MUN champion, and community builder driving change from the classroom to the corridors of governance.</p>
+    <a href="#contact" class="hero-cta">Get in touch →</a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stats">
+      <div class="stat-box">
+        <div class="stat-num">91%</div>
+        <div class="stat-label">Class 12 Score</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">10+</div>
+        <div class="stat-label">MUN Best Delegate Awards</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">1,500+</div>
+        <div class="stat-label">Youth Survey Respondents</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Army Troops Trained (VR)</div>
+      </div>
+    </div>
+    <p class="hero-quote">"Bridging data, policy, and storytelling to create systems that serve the many."</p>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-left">
+    <div class="section-label">About</div>
+    <h2>A student<br>who <em>builds</em></h2>
+    <div class="academics-list">
+      <div class="acad-item">
+        <div class="acad-grade">91%</div>
+        <div class="acad-label">Class 12 · DPS RK Puram</div>
+      </div>
+      <div class="acad-item">
+        <div class="acad-grade">86.7%</div>
+        <div class="acad-label">Class 11 · DPS RK Puram</div>
+      </div>
+      <div class="acad-item">
+        <div class="acad-grade">97.0%</div>
+        <div class="acad-label">Class 10 · APS Bathinda</div>
+      </div>
+      <div class="acad-item">
+        <div class="acad-grade">95.8%</div>
+        <div class="acad-label">Class 9 GPA</div>
+      </div>
+      <div class="acad-item">
+        <div class="acad-grade">5 / 5</div>
+        <div class="acad-label">AP English Language</div>
+      </div>
+      <div class="acad-item">
+        <div class="acad-grade">4 / 5</div>
+        <div class="acad-label">AP PreCalculus</div>
+      </div>
+    </div>
+  </div>
+  <div class="about-right">
+    <div class="section-label" style="margin-bottom:0.8rem;">My Story</div>
+    <p>I'm Shambhavi, a Class 12 student at Delhi Public School RK Puram. Growing up as an army kid, I attended 10 different schools across 10 years, living and learning across cities and cantonments all over India. That constant movement shaped me: it gave me adaptability, a sharp curiosity about the world, and a genuine love for meeting people from every walk of life.</p>
+    <p>I did my Class 10 from Army Public School, Bathinda, scoring 97%, before moving to DPS RK Puram for Class 11 and 12, where I scored 86.7% and 91% respectively. Through every school transition, I found ways not just to fit in, but to lead.</p>
+    <p>From publishing a policy report with the Government of India, to building India's first VR Combat Training Lab for the Indian Army, to winning a national gold medal for filmmaking, I try to bring rigor and creativity to everything I do. I am headed toward public policy, economics, or international relations, with a deep belief in using data and storytelling as tools for equity.</p>
+    <div class="tags-row">
+      <span class="highlight-tag">Digital Policy</span>
+      <span class="highlight-tag">Social Research</span>
+      <span class="highlight-tag">Filmmaking</span>
+      <span class="highlight-tag">Public Speaking</span>
+      <span class="highlight-tag">Data Analysis (Python)</span>
+      <span class="highlight-tag">MUN</span>
+      <span class="highlight-tag">Badminton</span>
+      <span class="highlight-tag">Economics</span>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Experience</div>
+  <h2>Work that <em>matters</em></h2>
+  <div class="exp-grid" style="margin-top:3.5rem;">
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-org">SAPI · Govt. of India</div>
+        <div class="exp-year">2024 to 2025</div>
+      </div>
+      <div>
+        <div class="exp-title">Lead Research Intern, Digital Policy</div>
+        <div class="exp-desc">Researched India's Digital Personal Data Protection Act (2023), focusing on parental consent for minors on social media. Led a 1,500+ youth survey, authored a policy report published with the Government of India, and produced a documentary released via SAPI platforms. Mentored by collaborators of Prof. Steve Mann and the Private Secretary to India's 13th President.</div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-org">IIT Roorkee / MIT</div>
+        <div class="exp-year">2024 to 2025</div>
+      </div>
+      <div>
+        <div class="exp-title">Data Strategist and Social Impact Researcher</div>
+        <div class="exp-desc">Under Dr. Chetan Ralekar (IIT Roorkee and MIT Post Doc). Conducted data-driven research on war widows (Veer Naris) in India, analysing demographics, welfare provisions, and policy gaps using Python. Published findings, organized counseling sessions, and led a financial literacy program empowering widows in rural areas.</div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-org">Indian Army</div>
+        <div class="exp-year">2023 to 2024</div>
+      </div>
+      <div>
+        <div class="exp-title">Lead Developer, VR Combat Training Lab (SANJAY-VR)</div>
+        <div class="exp-desc">Conceptualized and led India's first Virtual Reality Combat Training Lab, integrating Oculus headsets, simulator rifles, Google Earth, and US-based military simulations. The lab has trained 10,000+ Indian Army troops, enhancing training efficiency, safety, and resource optimization.</div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-org">Project Prakash · MIT</div>
+        <div class="exp-year">Summer 2025</div>
+      </div>
+      <div>
+        <div class="exp-title">Film Intern, Project Prakash Delhi</div>
+        <div class="exp-desc">Under Dr. Pawan Sinha (MIT). Documented and filmed the journeys of rural children undergoing free eye surgeries. Produced a short film released on the organization's official website, recognized widely as an impactful awareness tool.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- AWARDS -->
+<section id="awards">
+  <div class="section-label">Recognition</div>
+  <h2 style="color: var(--cream);">Honours and <em>Awards</em></h2>
+  <div class="awards-grid">
+    <div class="award-card">
+      <div class="award-icon">🏅</div>
+      <div class="award-title">WAVES National Gold Medal, Ministry of I&amp;B</div>
+      <div class="award-sub">1st Prize, Young Film Maker's Category · 2025</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🌏</div>
+      <div class="award-title">First Indian Shortlisted, MEXT Japanese Govt. Scholarship</div>
+      <div class="award-sub">Social Sciences (Economics, Business, Finance)</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">📜</div>
+      <div class="award-title">AP Scholar Award with Distinction</div>
+      <div class="award-sub">English 5/5 · PreCalculus 4/5</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🏆</div>
+      <div class="award-title">Principal's Red Blazer Award, Co-Curriculars</div>
+      <div class="award-sub">Grade 11 · DPS RK Puram · 2024 to 25</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🎓</div>
+      <div class="award-title">Cambridge Centre for International Research, Young Scholars</div>
+      <div class="award-sub">Shortlisted with Scholarship · 2025</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">⭐</div>
+      <div class="award-title">Top State Scholars Award, Grade 10</div>
+      <div class="award-sub">Class 10 School Topper in English · 100% Score</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🥇</div>
+      <div class="award-title">Best Delegate, SIGF International MUN 2025</div>
+      <div class="award-sub">200 participants</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🏅</div>
+      <div class="award-title">Best Delegate, St. Xavier's National MUN 2023</div>
+      <div class="award-sub">300-delegate cohort</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🎖️</div>
+      <div class="award-title">Best Student All-Rounder Award, Grade 10</div>
+      <div class="award-sub">DPS RK Puram · 2023 to 24</div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERSHIP -->
+<section id="leadership">
+  <div class="section-label">Leadership</div>
+  <h2>Community and <em>Service</em></h2>
+  <div class="lead-grid">
+    <div class="lead-card">
+      <div class="lead-role">Economics · DPS RK Puram</div>
+      <div class="lead-title">Director, Econocrats (Economics Club)</div>
+      <div class="lead-desc">Led the club magazine as Chief Student Editor. Organized the inaugural Comostitva Commerce Festival (2025 to 26).</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-role">Grassroots Initiative</div>
+      <div class="lead-title">Founder, Mock G20 at APS Bathinda</div>
+      <div class="lead-desc">Founded the Mock G20 at Army Public School, Bathinda Cantonment, bringing global governance simulations to a new institution.</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-role">Digital Awareness</div>
+      <div class="lead-title">Founder, Meraki Commune</div>
+      <div class="lead-desc">Established a digital community of 50+ youth volunteers spreading awareness on social issues across India.</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-role">Filmmaking · NADT Campaign</div>
+      <div class="lead-title">Short Film on Taxation Transparency</div>
+      <div class="lead-desc">Created a short film selected from 10,000+ entries for the National Academy of Direct Taxes' campaign, in collaboration with the Salwan Education Trust.</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-role">Student Council · 2024 to 25</div>
+      <div class="lead-title">Member, DPS RK Puram Student Council</div>
+      <div class="lead-desc">Served on the Student Council of DPS RK Puram in Grade 11, representing the student body in institutional decisions.</div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-role">Fundraising</div>
+      <div class="lead-title">Rotary Club · INR 50,000 Raised</div>
+      <div class="lead-desc">Organized and managed a fundraising stall raising INR 50,000 for education and community welfare through the school's Rotary chapter.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <div class="section-label">Contact</div>
+      <h2>Let's <em>connect</em></h2>
+      <p>Whether it's about policy research, filmmaking collaborations, MUN, or just a conversation, I'd love to hear from you.</p>
+      <div class="contact-direct">
+        <a href="mailto:shambhavigarg.29jun@gmail.com">shambhavigarg.29jun@gmail.com</a>
+        <a href="tel:+918491899919">+91 84918 99919</a>
+        <a href="https://www.linkedin.com/in/shambhavigarg" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+    <div>
+      <div class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="from_name">Your Name</label>
+            <input type="text" id="from_name" name="from_name" placeholder="Full name" required>
+          </div>
+          <div class="form-group">
+            <label for="from_phone">Phone Number</label>
+            <input type="tel" id="from_phone" name="from_phone" placeholder="+91 XXXXX XXXXX">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="from_email">Email Address</label>
+          <input type="email" id="from_email" name="from_email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="purpose">Purpose of Contact</label>
+          <select id="purpose" name="purpose" required>
+            <option value="" disabled selected>Select a reason</option>
+            <option>Collaboration on Research or Policy</option>
+            <option>Filmmaking or Creative Project</option>
+            <option>MUN or Public Speaking</option>
+            <option>College or Scholarship Inquiry</option>
+            <option>Media or Press</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="4" placeholder="Tell me more about what you have in mind..." required></textarea>
+        </div>
+        <div class="form-status" id="formStatus"></div>
+        <button type="button" class="submit-btn" id="submitBtn" onclick="sendEmail()">Send Message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-text">© 2026 Shambhavi Garg · Delhi, India</span>
+  <span class="footer-text">Designed with intention.</span>
+</footer>
+
+<script>
+  // ─────────────────────────────────────────────
+  // EMAILJS SETUP
+  // Step 1: Go to https://www.emailjs.com and create a free account
+  // Step 2: Add a Gmail service → copy your Service ID below
+  // Step 3: Create an email template → copy your Template ID below
+  // Step 4: Copy your Public Key from Account → API Keys
+  // ─────────────────────────────────────────────
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // replace this
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // replace this
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // replace this
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  function sendEmail() {
+    const btn    = document.getElementById('submitBtn');
+    const status = document.getElementById('formStatus');
+
+    const name    = document.getElementById('from_name').value.trim();
+    const phone   = document.getElementById('from_phone').value.trim();
+    const email   = document.getElementById('from_email').value.trim();
+    const purpose = document.getElementById('purpose').value;
+    const message = document.getElementById('message').value.trim();
+
+    if (!name || !email || !purpose || !message) {
+      status.className = 'form-status error';
+      status.textContent = 'Please fill in all required fields.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.className = 'form-status';
+    status.style.display = 'none';
+
+    const templateParams = { from_name: name, from_phone: phone || 'Not provided', from_email: email, purpose: purpose, message: message };
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+      .then(() => {
+        status.className = 'form-status success';
+        status.textContent = 'Message sent! Shambhavi will get back to you soon.';
+        document.getElementById('from_name').value = '';
+        document.getElementById('from_phone').value = '';
+        document.getElementById('from_email').value = '';
+        document.getElementById('purpose').value = '';
+        document.getElementById('message').value = '';
+        btn.textContent = 'Send Message';
+        btn.disabled = false;
+      })
+      .catch((err) => {
+        status.className = 'form-status error';
+        status.textContent = 'Something went wrong. Please email directly at shambhavigarg.29jun@gmail.com';
+        btn.textContent = 'Send Message';
+        btn.disabled = false;
+        console.error('EmailJS error:', err);
+      });
+  }
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Scroll reveal (no sticky conflicts)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.exp-item, .award-card, .lead-card, .stat-box').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
