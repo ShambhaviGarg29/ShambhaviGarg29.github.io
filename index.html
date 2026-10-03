@@ -132,7 +132,7 @@ const R={
  tags:b=>`<div class="tags">${b.items.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`,
  video:b=>`<div class="vid"><div class="vid-box"><iframe src="https://www.youtube-nocookie.com/embed/${b.id}?rel=0&modestbranding=1" title="${esc(b.cap||'video')}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>${b.cap?`<figcaption>${esc(b.cap)}</figcaption>`:''}</div>`,
  links:b=>`<p class="links">${b.items.map(l=>`<a href="${l.href}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(' ')}</p>`,
- chat:()=>`<div class="chatbox" id="chatbox"><div class="chatlog" id="chatlog" aria-live="polite"></div><form id="chatform" class="chatform" autocomplete="off"><input id="chatinput" maxlength="300" placeholder="Ask me anything — favourite colour, middle school, why VR..." required><button type="submit">Ask</button></form><p class="chatnote">An AI built on what I've told it — not really me. For the real me: <a href="mailto:${D.contact.email}">email</a> or <a href="${D.contact.linkedin}" target="_blank" rel="noopener">LinkedIn</a>.</p></div>`,
+ chat:()=>`<div class="chatbox" id="chatbox"><div class="chatlog" id="chatlog" aria-live="polite"></div><form id="chatform" class="chatform" autocomplete="off"><input id="chatinput" maxlength="300" placeholder="Ask me anything — research, VR, leadership, films..." required><button type="submit">Ask</button></form><p class="chatnote">A portfolio assistant grounded in what I've actually shared. For the real me: <a href="mailto:${D.contact.email}">email</a> or <a href="${D.contact.linkedin}" target="_blank" rel="noopener">LinkedIn</a>.</p></div>`,
  contact:()=>{const c=D.contact;return `<div class="form"><div class="links"><a href="mailto:${c.email}">${c.email}</a><a href="tel:${c.phone.replace(/[^+\d]/g,'')}">${c.phone}</a><a href="${c.linkedin}" target="_blank" rel="noopener">LinkedIn</a></div>
  <label for="cn">Your name</label><input id="cn" autocomplete="name"><label for="ce">Email</label><input id="ce" type="email" autocomplete="email"><label for="cm">Message</label><textarea id="cm" rows="3"></textarea>
  <button id="cs" type="button">Send</button><div class="st" id="cst" role="status"></div></div>`}
@@ -160,24 +160,164 @@ function send(){
    .catch(()=>{st.textContent='That did not send. Please email '+D.contact.email;$('cs').disabled=false});
 }
 $('hint').textContent=D.hint;
-function buildBio(){const out=[];D.sections.forEach(s=>{if(s.id==='talk')return;s.blocks.forEach(b=>{
-  if(b.k==='say'||b.k==='p')out.push(b.text);
-  else if(b.k==='rows')b.items.forEach(r=>out.push(r.title+' \u2014 '+r.text));
-  else if(b.k==='tags')out.push('Skills/interests: '+b.items.join(', '));
-});});
- if(D.funFacts)Object.entries(D.funFacts).forEach(([k,v])=>{if(v&&!/^FILL/.test(v))out.push(k+': '+v)});
- return out.join('\n')}
-let chatHist=[];
-function renderMsg(role,text){const log=$('chatlog');if(!log)return;const d=document.createElement('div');d.className='msg '+(role==='user'?'me':'ai');d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+/* ---------- grounded portfolio assistant ----------
+   This is intentionally client-side: it never invents facts and never needs
+   an API key. It turns the structured portfolioData into a small semantic
+   retrieval layer, then writes answers from the retrieved material.
+*/
+const STOP_WORDS=new Set([
+  'a','an','and','are','as','at','be','been','but','by','can','could','did','do','does','for','from','get','got','had','has','have','how','i','if','in','into','is','it','me','my','of','on','or','she','tell','that','the','their','them','there','they','this','to','was','what','when','where','which','who','why','with','would','your','you','about','really','just','her','his','our','we'
+]);
+const ALIASES={
+  research:['research','researcher','studied','study','policy','data','survey','sapi','digital policy','war widows','veer naris','data strategist'],
+  innovation:['innovation','vr','virtual reality','combat','sanjay','army','technical','developer','building','technology'],
+  charity:['charity','volunteer','volunteering','social impact','community','fundraiser','meraki','war widows','film','cause'],
+  persona:['personality','person','background','grew up','army kid','schools','school','stony brook','major','majoring','degree','life','who are you'],
+  milestones:['awards','award','achievement','achievements','leadership','model un','mun','delegate','medal','scholarship','women in business','accomplishment'],
+  skills:['skills','good at','strengths','python','statistics','storytelling','filmmaking','negotiation','public speaking','programming'],
+  career:['career','future','goal','goals','want to do','work in','interested in','profession'],
+  education:['education','college','university','stony brook','major','degree','graduat','class of'],
+  vr:['vr','virtual reality','sanjay','combat training','training lab'],
+  films:['film','filmmaking','filmmaker','documentary','directed','camera','video'],
+  mun:['model un','model united nations','mun','delegate','chairperson'],
+  women:['women in business','international women','women'],
+  warwidows:['war widows','veer naris','widows','welfare access','financial literacy'],
+  digitalpolicy:['digital policy','data protection','personal data','dpdp','parental consent','minors','social media'],
+  fun:['favourite','favorite','food','colour','color','middle school','fun fact','weird fact']
+};
+const STOP_STEMS=['what','whats','what’s','tell','about','your','you','the','research','please','can','could','would','explain','describe','more','me','i','want','know','how','why','who','are','is','do','does'];
+const normalize=s=>String(s||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9+\s-]/g,' ').replace(/\s+/g,' ').trim();
+const tokens=s=>normalize(s).split(/\s+/).filter(w=>w.length>2&&!STOP_WORDS.has(w));
+const wordsIn=s=>new Set(tokens(s));
+function allPortfolioItems(){
+  const items=[];
+  S.forEach(section=>{
+    if(section.id==='talk')return;
+    const add=(text,type='text',meta='')=>{if(text)items.push({section:section.id,sectionName:section.name,text:String(text),type,meta});};
+    section.blocks.forEach(b=>{
+      if(b.k==='say'||b.k==='p')add(b.text,b.k);
+      if(b.k==='rows')b.items.forEach(r=>add(r.title+' — '+r.text,'row',r.meta));
+      if(b.k==='stats')b.items.forEach(i=>add(i[0]+' '+i[1],'stat'));
+      if(b.k==='tags')add(b.items.join(', '),'tags');
+    });
+  });
+  if(D.funFacts)Object.entries(D.funFacts).forEach(([k,v])=>{if(v&&!/^FILL/i.test(v))add(k+': '+v,'fact')});
+  return items;
+}
+const KB=allPortfolioItems();
+function sectionForIntent(q){
+  const n=normalize(q);let best=null,bestScore=0;
+  Object.entries(ALIASES).forEach(([intent,terms])=>{
+    let score=0;
+    terms.forEach(term=>{
+      const t=normalize(term);
+      if(n.includes(t))score+=t.includes(' ')?4:2;
+    });
+    if(score>bestScore){bestScore=score;best=intent;}
+  });
+  const direct={research:'research',innovation:'innovation',charity:'charity',persona:'persona',milestones:'milestones'};
+  if(best&&direct[best])return direct[best];
+  if(best==='vr')return 'innovation';
+  if(best==='films')return 'charity';
+  if(best==='mun'||best==='women')return 'milestones';
+  if(best==='warwidows')return 'research';
+  if(best==='digitalpolicy')return 'research';
+  return best;
+}
+function relevance(item,q,intent){
+  const n=normalize(q), qt=wordsIn(q), text=normalize(item.sectionName+' '+item.text+' '+item.meta);
+  const tt=wordsIn(text);let score=0;
+  qt.forEach(w=>{if(tt.has(w))score+=2;else if(text.includes(w))score+=.7});
+  if(intent){
+    const aliases=ALIASES[intent]||[];
+    aliases.forEach(term=>{const t=normalize(term);if(text.includes(t))score+=t.includes(' ')?3:1});
+    if((intent==='research'&&item.section==='research')||(intent==='innovation'&&item.section==='innovation')||(intent==='charity'&&item.section==='charity')||(intent==='persona'&&item.section==='persona')||(intent==='milestones'&&item.section==='milestones'))score+=5;
+  }
+  return score;
+}
+function cleanSentence(text,max=420){
+  const t=String(text).replace(/\s+/g,' ').trim();
+  return t.length<=max?t:t.slice(0,max).replace(/\s+\S*$/,'')+'…';
+}
+function firstParagraphs(sectionId,count=2){
+  return KB.filter(x=>x.section===sectionId&&x.type==='p').slice(0,count).map(x=>x.text);
+}
+function namedRows(sectionId,terms){
+  return KB.filter(x=>x.section===sectionId&&x.type==='row'&&terms.some(t=>normalize(x.text+' '+x.meta).includes(normalize(t))));
+}
+function answerBySection(sectionId,q){
+  const section=S.find(s=>s.id===sectionId);if(!section)return null;
+  const ps=firstParagraphs(sectionId,2);
+  const intro={
+    research:"I've spent most of my research time on questions where policy, data, and people's lived experiences overlap.",
+    innovation:"The biggest technical project in my portfolio is SANJAY-VR, a virtual-reality combat training system I conceived and led with the Indian Army.",
+    charity:"A lot of my community work combines storytelling, volunteering, and practical programs rather than treating them as separate things.",
+    persona:"A big part of my story is learning how to adapt quickly. I grew up as an army kid and moved through ten schools in ten years across India.",
+    milestones:"My portfolio has a mix of leadership, competitions, Model UN, scholarships, and community-building experiences."
+  }[sectionId]||'';
+  const extra=[];
+  if(sectionId==='research'){
+    const dp=namedRows('research',['Digital Personal','social media','parental consent']);
+    const ww=namedRows('charity',['war widows']);
+    if(dp.length)extra.push(cleanSentence(dp[0].text,650));
+    if(ww.length)extra.push(cleanSentence(ww[0].text,500));
+  } else if(sectionId==='innovation'){
+    const rows=KB.filter(x=>x.section==='innovation'&&x.type==='p');
+    if(rows[1])extra.push(cleanSentence(rows[1].text,600));
+  } else if(sectionId==='charity'){
+    const rows=KB.filter(x=>x.section==='charity'&&x.type==='row').slice(0,3);
+    if(rows.length)extra.push(rows.map(r=>`${r.title}: ${cleanSentence(r.text,250)}`).join('\n'));
+  } else if(sectionId==='milestones'){
+    const rows=KB.filter(x=>x.section==='milestones'&&x.type==='row').slice(0,4);
+    if(rows.length)extra.push(rows.map(r=>`${r.title}: ${cleanSentence(r.text,220)}`).join('\n'));
+  }
+  return [intro,...ps.filter(x=>x!==intro),...extra].filter(Boolean).join('\n\n');
+}
+function answerFromFacts(q){
+  const n=normalize(q);
+  const facts=KB.filter(x=>x.type==='fact');
+  if(!facts.length)return null;
+  const hit=facts.find(f=>{
+    const k=normalize(f.text.split(':')[0]);
+    return n.includes(k)||k.split(' ').some(w=>w.length>3&&n.includes(w));
+  });
+  return hit?hit.text:null;
+}
 function localAnswer(q){
- const lines=buildBio().split('\n').filter(Boolean);
- const qWords=(q.toLowerCase().match(/[a-z0-9]+/g)||[]).filter(w=>w.length>2);
- let best=null,bestScore=0;
- lines.forEach(line=>{const l=line.toLowerCase();let score=0;qWords.forEach(w=>{if(l.includes(w))score++;});if(score>bestScore){bestScore=score;best=line;}});
- return bestScore?best:"I haven't been told that one yet \u2014 ask the real me below!"}
+  const raw=q.trim(), n=normalize(raw);
+  if(!n)return '';
+  const fact=answerFromFacts(raw);
+  if(fact)return fact;
+
+  const followup=/^(tell me more|more|go on|expand|explain more|what else|and what about it|why|how so)\b/.test(n);
+  let intent=sectionForIntent(raw);
+  if(followup&&chatHist.length)intent=chatHist[chatHist.length-1].intent||intent;
+  if(intent==='fun' && !fact){
+    return "I haven't been told that one yet. I don't want to make up a personal detail that isn't in the portfolio. You can ask me about my research, projects, background, leadership, films, or interests instead.";
+  }
+
+  if(intent && ['research','innovation','charity','persona','milestones'].includes(intent)){
+    chatHist.push({intent});
+    return answerBySection(intent,raw);
+  }
+
+  const scored=KB.map(item=>({item,score:relevance(item,raw,intent)})).filter(x=>x.score>1).sort((a,b)=>b.score-a.score);
+  if(scored.length){
+    const top=scored.slice(0,4).map(x=>x.item);
+    const unique=[];const seen=new Set();
+    top.forEach(x=>{const key=x.section+'|'+x.text;if(!seen.has(key)){seen.add(key);unique.push(x)}});
+    const sections=[...new Set(unique.map(x=>x.section))];
+    if(sections.length===1&&['research','innovation','charity','persona','milestones'].includes(sections[0]))return answerBySection(sections[0],raw);
+    chatHist.push({intent:sections[0]});
+    return unique.slice(0,3).map(x=>cleanSentence(x.text,500)).join('\n\n');
+  }
+  return "I don't have enough information in my portfolio to answer that without guessing. Try asking about my research, SANJAY-VR, community work, background, leadership, Model UN, filmmaking, or Stony Brook.";
+}
+function renderMsg(role,text){const log=$('chatlog');if(!log)return;const d=document.createElement('div');d.className='msg '+(role==='user'?'me':'ai');d.style.whiteSpace='pre-line';d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
 function chatSend(e){e.preventDefault();const inp=$('chatinput');if(!inp)return;const text=inp.value.trim();if(!text)return;
  renderMsg('user',text);inp.value='';
- setTimeout(()=>renderMsg('ai',localAnswer(text)),250)}
+ setTimeout(()=>renderMsg('ai',localAnswer(text)),220);
+}
 document.addEventListener('submit',e=>{if(e.target&&e.target.id==='chatform')chatSend(e)});
 /* keyboard / screen-reader / no-WebGL access to the six faces */
 const fbox=$('faces'),fb=S.map((s,i)=>{const b=document.createElement('button');b.textContent=s.name;b.onclick=()=>openFace(i);fbox.appendChild(b);return b});
